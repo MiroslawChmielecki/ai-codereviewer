@@ -119,6 +119,25 @@ function getBaseAndHeadShas(owner, repo, pull_number) {
         };
     });
 }
+function getEslintRules() {
+    const eslintConfigFiles = [
+        ".eslintrc.js",
+        ".eslintrc.cjs",
+        ".eslintrc.json",
+        ".eslintrc.yaml",
+        ".eslintrc.yml",
+        ".eslintrc",
+    ];
+    let eslintRules = (0, fs_1.readFileSync)("rules.txt", "utf8");
+    for (const file of eslintConfigFiles) {
+        try {
+            eslintRules = (0, fs_1.readFileSync)(file, "utf8");
+            break;
+        }
+        catch (e) { }
+    }
+    return eslintRules;
+}
 function createPrompt(file, chunk, prDetails) {
     return `Your task is to review pull requests. Instructions:
 - Provide the response in following JSON format:  [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]
@@ -131,7 +150,7 @@ function createPrompt(file, chunk, prDetails) {
 - Always propose the code to resolve given issue found by you.
 
 Always use following ESLint rules:
-${(0, fs_1.readFileSync)('rules.txt'), 'utf8'}
+${getEslintRules()}
 
 Review the following code diff in the file "${file.to}" and take the pull request title and description into account when writing the response.
   
